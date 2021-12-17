@@ -5,13 +5,16 @@ LABEL maintainer="mike.robin.haller@gmail.com"
 ENV http_proxy http://host.docker.internal:3128
 ENV https_proxy http://host.docker.internal:3128
 
+ENV APT_CACHER_NG_CACHE_DIR=/var/cache/apt-cacher-ng \
+    APT_CACHER_NG_LOG_DIR=/var/log/apt-cacher-ng \
+    APT_CACHER_NG_USER=apt-cacher-ng
+
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
       apt-cacher-ng ca-certificates wget \
       && rm -rf /var/lib/apt/lists/*
 
 COPY acng.conf /etc/apt-cacher-ng/acng.conf
-
 COPY entrypoint.sh /sbin/entrypoint.sh
 
 RUN chmod 755 /sbin/entrypoint.sh
