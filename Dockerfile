@@ -1,18 +1,16 @@
-FROM ubuntu:focal-20200423
+FROM ubuntu:latest
 
-LABEL maintainer="sameer@damagehead.com"
+LABEL maintainer="mike.robin.haller@gmail.com"
 
-ENV APT_CACHER_NG_VERSION=3.3 \
-    APT_CACHER_NG_CACHE_DIR=/var/cache/apt-cacher-ng \
-    APT_CACHER_NG_LOG_DIR=/var/log/apt-cacher-ng \
-    APT_CACHER_NG_USER=apt-cacher-ng
+ENV http_proxy http://host.docker.internal:3128
+ENV https_proxy http://host.docker.internal:3128
 
 RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-      apt-cacher-ng=${APT_CACHER_NG_VERSION}* ca-certificates wget \
- && sed 's/# ForeGround: 0/ForeGround: 1/' -i /etc/apt-cacher-ng/acng.conf \
- && sed 's/# PassThroughPattern:.*this would allow.*/PassThroughPattern: .* #/' -i /etc/apt-cacher-ng/acng.conf \
- && rm -rf /var/lib/apt/lists/*
+      apt-cacher-ng ca-certificates wget \
+      && rm -rf /var/lib/apt/lists/*
+
+COPY acng.conf /etc/apt-cacher-ng/acng.conf
 
 COPY entrypoint.sh /sbin/entrypoint.sh
 
